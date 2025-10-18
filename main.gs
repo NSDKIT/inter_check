@@ -381,15 +381,13 @@ function doPost(e) {
   const isResetMessage = (userMessage === "リセット");
   
   if (isResetMessage) {
-    // 「リセット」メッセージの場合 - 全チームのtempシートの状態フラグをクリア
+    // 「リセット」メッセージの場合 - 全チームのtempシートをクリア
     const allTempSheets = ["tempA", "tempB", "tempC"];
     for (const sheetName of allTempSheets) {
-      let sheet = spreadsheet.getSheetByName(sheetName);
-      if (!sheet) {
-        sheet = spreadsheet.insertSheet(sheetName);
+      const sheet = spreadsheet.getSheetByName(sheetName);
+      if (sheet) {
+        sheet.clear();
       }
-      // A1からH1までの状態フラグをクリア（シート全体をクリアしない）
-      sheet.getRange("A1:H1").clearContent();
     }
     
     const url = 'https://api.line.me/v2/bot/message/reply';
