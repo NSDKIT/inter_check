@@ -296,7 +296,7 @@ function doPost(e) {
     
   } else if (isChangeIncreaseMessage) {
     // 「釣り銭増額」メッセージの場合
-    // 現在のチームのtempシートに釣り銭増額モードフラグを設定
+    // 現在のtempシートに釣り銭増額モードフラグを設定
     if (tempSheet) {
       tempSheet.getRange("H1").setValue("change_increase_mode");
     }
@@ -327,12 +327,30 @@ function doPost(e) {
     
   } else if (isTeamAMessage) {
     // 「teamA」メッセージの場合
+    // 切り替え前のシートのモードフラグを取得
+    const previousModeFlag = tempSheet ? tempSheet.getRange("H1").getValue() : "";
+    
     tempSheet = spreadsheet.getSheetByName("tempA");
     
     // F1セルにteamA状態を保存
     tempSheet.getRange("F1").setValue("teamA");
     // currentTeam変数も更新
     currentTeam = "A";
+    
+    // モードフラグを新しいシートに引き継ぐ
+    if (previousModeFlag) {
+      tempSheet.getRange("H1").setValue(previousModeFlag);
+    }
+    
+    // 他のチームのH1をクリア
+    const tempBSheet = spreadsheet.getSheetByName("tempB");
+    if (tempBSheet) {
+      tempBSheet.getRange("H1").setValue("");
+    }
+    const tempCSheet = spreadsheet.getSheetByName("tempC");
+    if (tempCSheet) {
+      tempCSheet.getRange("H1").setValue("");
+    }
     
     // 釣り銭増額モードかどうかを確認
     const modeFlag = tempSheet.getRange("H1").getValue();
@@ -371,12 +389,30 @@ function doPost(e) {
     
   } else if (isTeamBMessage) {
     // 「teamB」メッセージの場合
+    // 切り替え前のシートのモードフラグを取得
+    const previousModeFlag = tempSheet ? tempSheet.getRange("H1").getValue() : "";
+    
     tempSheet = spreadsheet.getSheetByName("tempB");
     
     // F1セルにteamB状態を保存
     tempSheet.getRange("F1").setValue("teamB");
     // currentTeam変数も更新
     currentTeam = "B";
+    
+    // モードフラグを新しいシートに引き継ぐ
+    if (previousModeFlag) {
+      tempSheet.getRange("H1").setValue(previousModeFlag);
+    }
+    
+    // 他のチームのH1をクリア
+    const tempASheet = spreadsheet.getSheetByName("tempA");
+    if (tempASheet) {
+      tempASheet.getRange("H1").setValue("");
+    }
+    const tempCSheet = spreadsheet.getSheetByName("tempC");
+    if (tempCSheet) {
+      tempCSheet.getRange("H1").setValue("");
+    }
     
     // 釣り銭増額モードかどうかを確認
     const modeFlag = tempSheet.getRange("H1").getValue();
@@ -414,12 +450,30 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
   } else if (isTeamCMessage) {
     // 「teamC」メッセージの場合
+    // 切り替え前のシートのモードフラグを取得
+    const previousModeFlag = tempSheet ? tempSheet.getRange("H1").getValue() : "";
+    
     tempSheet = spreadsheet.getSheetByName("tempC");
     
     // F1セルにteamC状態を保存
     tempSheet.getRange("F1").setValue("teamC");
     // currentTeam変数も更新
     currentTeam = "C";
+    
+    // モードフラグを新しいシートに引き継ぐ
+    if (previousModeFlag) {
+      tempSheet.getRange("H1").setValue(previousModeFlag);
+    }
+    
+    // 他のチームのH1をクリア
+    const tempASheet = spreadsheet.getSheetByName("tempA");
+    if (tempASheet) {
+      tempASheet.getRange("H1").setValue("");
+    }
+    const tempBSheet = spreadsheet.getSheetByName("tempB");
+    if (tempBSheet) {
+      tempBSheet.getRange("H1").setValue("");
+    }
     
     // 釣り銭増額モードかどうかを確認
     const modeFlag = tempSheet.getRange("H1").getValue();
