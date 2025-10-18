@@ -64,6 +64,9 @@ function doPost(e) {
   const isTeamBMessage = (userMessage === "teamB");
   const isTeamCMessage = (userMessage === "teamC");
   
+  // 「釣り銭増額」メッセージの処理
+  const isChangeIncreaseMessage = (userMessage === "釣り銭増額");
+  
   // チーム判定とtempシートの取得
   let currentTeam = "A"; // デフォルトはA
   let tempSheet = null;
@@ -108,6 +111,7 @@ function doPost(e) {
   let waitingForDeposit = false;
   let waitingForGas = false;
   let waitingForDetailPeriod = false;
+  let waitingForChangeIncrease = false;
   
   if (tempSheet) {
     const waitingFlag = tempSheet.getRange("D1").getValue();
@@ -116,6 +120,7 @@ function doPost(e) {
     waitingForDeposit = (waitingFlag === "waiting_for_deposit");
     waitingForGas = (waitingFlag === "waiting_for_gas");
     waitingForDetailPeriod = (waitingFlag === "waiting_for_detail_period");
+    waitingForChangeIncrease = (waitingFlag === "waiting_for_change_increase");
   }
   
   // 「記録」メッセージの処理
@@ -289,6 +294,37 @@ function doPost(e) {
     
     return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
     
+  } else if (isChangeIncreaseMessage) {
+    // 「釣り銭増額」メッセージの場合
+    // 現在のチームのtempシートに釣り銭増額モードフラグを設定
+    if (tempSheet) {
+      tempSheet.getRange("H1").setValue("change_increase_mode");
+    }
+    
+    const url = 'https://api.line.me/v2/bot/message/reply';
+    UrlFetchApp.fetch(url, {
+      'headers': {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN,
+      },
+      'method': 'post',
+      'payload': JSON.stringify({
+        'replyToken': replyToken,
+        'messages': [
+          {
+            'type': 'text',
+            'text': '釣り銭増額モードです。',
+          },
+          {
+            'type': 'text',
+            'text': 'チームを選択してください。',
+          }
+        ]
+      })
+    });
+    
+    return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
+    
   } else if (isTeamAMessage) {
     // 「teamA」メッセージの場合
     tempSheet = spreadsheet.getSheetByName("tempA");
@@ -297,6 +333,16 @@ function doPost(e) {
     tempSheet.getRange("F1").setValue("teamA");
     // currentTeam変数も更新
     currentTeam = "A";
+    
+    // 釣り銭増額モードかどうかを確認
+    const modeFlag = tempSheet.getRange("H1").getValue();
+    
+    let secondMessage = '';
+    if (modeFlag === "change_increase_mode") {
+      secondMessage = 'いつの釣り銭を増額しますか？';
+    } else {
+      secondMessage = 'いつを記録しますか？';
+    }
     
     // 完了メッセージを送信
     const url = 'https://api.line.me/v2/bot/message/reply';
@@ -315,7 +361,7 @@ function doPost(e) {
           },
           {
             'type': 'text',
-            'text': 'いつを記録しますか？',
+            'text': secondMessage,
           }
         ]
       })
@@ -331,6 +377,16 @@ function doPost(e) {
     tempSheet.getRange("F1").setValue("teamB");
     // currentTeam変数も更新
     currentTeam = "B";
+    
+    // 釣り銭増額モードかどうかを確認
+    const modeFlag = tempSheet.getRange("H1").getValue();
+    
+    let secondMessage = '';
+    if (modeFlag === "change_increase_mode") {
+      secondMessage = 'いつの釣り銭を増額しますか？';
+    } else {
+      secondMessage = 'いつを記録しますか？';
+    }
     
     // 完了メッセージを送信
     const url = 'https://api.line.me/v2/bot/message/reply';
@@ -349,7 +405,7 @@ function doPost(e) {
           },
           {
             'type': 'text',
-            'text': 'いつを記録しますか？',
+            'text': secondMessage,
           }
         ]
       })
@@ -364,6 +420,16 @@ function doPost(e) {
     tempSheet.getRange("F1").setValue("teamC");
     // currentTeam変数も更新
     currentTeam = "C";
+    
+    // 釣り銭増額モードかどうかを確認
+    const modeFlag = tempSheet.getRange("H1").getValue();
+    
+    let secondMessage = '';
+    if (modeFlag === "change_increase_mode") {
+      secondMessage = 'いつの釣り銭を増額しますか？';
+    } else {
+      secondMessage = 'いつを記録しますか？';
+    }
     
     // 完了メッセージを送信
     const url = 'https://api.line.me/v2/bot/message/reply';
@@ -382,7 +448,7 @@ function doPost(e) {
           },
           {
             'type': 'text',
-            'text': 'いつを記録しますか？',
+            'text': secondMessage,
           }
         ]
       })
@@ -1309,6 +1375,19 @@ function doPost(e) {
       timeSheet = spreadsheet.insertSheet(timeSheetName);
     }
     
+    // 釣り銭増額モードかどうかを確認
+    const modeFlag = tempSheet.getRange("H1").getValue();
+    
+    let secondMessage = '';
+    if (modeFlag === "change_increase_mode") {
+      // 釣り銭増額モードの場合
+      tempSheet.getRange("D1").setValue("waiting_for_change_increase");
+      secondMessage = '増加額（円）を入力してください。';
+    } else {
+      // 通常モード（売上記録）の場合
+      secondMessage = '売上ですか？入金・ガソリン他ですか？';
+    }
+    
     // 完了メッセージを送信
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
@@ -1326,7 +1405,7 @@ function doPost(e) {
           },
           {
             'type': 'text',
-            'text': '売上ですか？入金・ガソリン他ですか？',
+            'text': secondMessage,
           }
         ]
       })
@@ -1581,6 +1660,19 @@ function doPost(e) {
       // tempシートのB1に日を記録
       tempSheet.getRange("B1").setValue(userMessage);
       
+      // 釣り銭増額モードかどうかを確認
+      const modeFlag = tempSheet.getRange("H1").getValue();
+      
+      let secondMessage = '';
+      if (modeFlag === "change_increase_mode") {
+        // 釣り銭増額モードの場合
+        tempSheet.getRange("D1").setValue("waiting_for_change_increase");
+        secondMessage = '増加額（円）を入力してください。';
+      } else {
+        // 通常モード
+        secondMessage = '売上ですか？入金・ガソリン他ですか？';
+      }
+      
       // 完了メッセージを送信
       const url = 'https://api.line.me/v2/bot/message/reply';
       UrlFetchApp.fetch(url, {
@@ -1598,7 +1690,7 @@ function doPost(e) {
             },
             {
               'type': 'text',
-              'text': '売上ですか？入金・ガソリン他ですか？',
+              'text': secondMessage,
             }
           ]
         })
@@ -1804,6 +1896,81 @@ function doPost(e) {
         }
       }
     }  
+  } else if (waitingForChangeIncrease) {
+    // 釣り銭増額の金額入力を処理
+    if (!isHalfWidthNumber) {
+      const url = 'https://api.line.me/v2/bot/message/reply';
+      UrlFetchApp.fetch(url, {
+        'headers': {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN,
+        },
+        'method': 'post',
+        'payload': JSON.stringify({
+          'replyToken': replyToken,
+          'messages': [{
+            'type': 'text',
+            'text': '半角数字で再度回答してください',
+          }]
+        })
+      });
+      return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // 半角数字の場合は釣り銭増額として処理
+    if (tempSheet) {
+      const month = tempSheet.getRange("A1").getValue();
+      const day = tempSheet.getRange("B1").getValue();
+      
+      if (month && day) {
+        const monthSheetName = currentTeam + "_現金管理表_" + month;
+        let monthSheet = spreadsheet.getSheetByName(monthSheetName);
+        if (monthSheet) {
+          const data = monthSheet.getDataRange().getValues();
+          let dayRow = -1;
+          
+          for (let i = 0; i < data.length; i++) {
+            if (data[i][0] === day) {
+              dayRow = i + 1;
+              break;
+            }
+          }
+          
+          if (dayRow === -1) {
+            const lastRow = monthSheet.getLastRow() + 1;
+            monthSheet.getRange("A" + lastRow).setValue(day);
+            dayRow = lastRow;
+          }
+          
+          // 釣り銭増額をP列に記録
+          monthSheet.getRange("P" + dayRow).setValue(parseInt(userMessage));
+          
+          // フラグとモードをクリア
+          tempSheet.getRange("D1").setValue("");
+          tempSheet.getRange("H1").setValue("");
+          
+          const url = 'https://api.line.me/v2/bot/message/reply';
+          UrlFetchApp.fetch(url, {
+            'headers': {
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN,
+            },
+            'method': 'post',
+            'payload': JSON.stringify({
+              'replyToken': replyToken,
+              'messages': [
+                {
+                  'type': 'text',
+                  'text': '釣り銭増額を記録しました。\n増加額: ' + userMessage + '円',
+                }
+              ]
+            })
+          });
+          
+          return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    }
   } else if (waitingForAmount) {
     // 「○件目」の後の入力を処理
     if (!isHalfWidthNumber) {
