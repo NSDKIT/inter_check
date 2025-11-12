@@ -219,6 +219,15 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
     
   } else if (isRecordMessage) {
+    // 全tempシートをクリア（リセット処理と同じ）
+    const allTempSheets = ["tempA", "tempB", "tempC"];
+    for (const sheetName of allTempSheets) {
+      const sheet = spreadsheet.getSheetByName(sheetName);
+      if (sheet) {
+        sheet.clear();
+      }
+    }
+    
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
