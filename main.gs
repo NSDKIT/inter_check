@@ -2081,8 +2081,70 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
     }
     
-    // ★★★ ここに0チェックを追加 ★★★
+    // ★★★ 0チェックを追加：0の場合は該当セルを削除 ★★★
     if (parseInt(userMessage) === 0) {
+      if (tempSheet) {
+        const month = tempSheet.getRange("A1").getValue();
+        const day = tempSheet.getRange("B1").getValue();
+        const columnLetter = tempSheet.getRange("C1").getValue();
+        
+        if (month && day && columnLetter) {
+          // 現金管理表から該当セルを削除
+          const monthSheetName = currentTeam + "_現金管理表_" + month;
+          let monthSheet = spreadsheet.getSheetByName(monthSheetName);
+          if (monthSheet) {
+            const data = monthSheet.getDataRange().getValues();
+            let dayRow = -1;
+            
+            for (let i = 0; i < data.length; i++) {
+              if (data[i][0] === day) {
+                dayRow = i + 1;
+                break;
+              }
+            }
+            
+            if (dayRow !== -1) {
+              const amountColumn = columnLetter; // B, D, F, H
+              const typeColumn = String.fromCharCode(columnLetter.charCodeAt(0) + 1); // C, E, G, I
+              
+              // 売上金額と売上タイプを削除
+              monthSheet.getRange(amountColumn + dayRow).clearContent();
+              monthSheet.getRange(typeColumn + dayRow).clearContent();
+            }
+          }
+          
+          // 売上・時間当たり売上高管理表から該当セルを削除
+          const timeSheetName = currentTeam + "_売上・時間当たり売上高管理表_" + month;
+          let timeSheet = spreadsheet.getSheetByName(timeSheetName);
+          if (timeSheet) {
+            const data = timeSheet.getDataRange().getValues();
+            let dayRow = -1;
+            
+            for (let i = 0; i < data.length; i++) {
+              if (data[i][0] === day) {
+                dayRow = i + 1;
+                break;
+              }
+            }
+            
+            if (dayRow !== -1) {
+              const itemNumber = parseInt(columnLetter.charCodeAt(0) - 65);
+              const actualItemNumber = (itemNumber + 1) / 2;
+              const salesColumn = String.fromCharCode(65 + actualItemNumber * 2 - 1); // B, D, F, H
+              const timeColumn = String.fromCharCode(65 + actualItemNumber * 2);      // C, E, G, I
+              
+              // 売上金額と稼働時間を削除
+              timeSheet.getRange(salesColumn + dayRow).clearContent();
+              timeSheet.getRange(timeColumn + dayRow).clearContent();
+            }
+          }
+          
+          // フラグをクリア
+          tempSheet.getRange("C1:E1").clearContent();
+          tempSheet.getRange("G1").clearContent();
+        }
+      }
+      
       const url = 'https://api.line.me/v2/bot/message/reply';
       UrlFetchApp.fetch(url, {
         'headers': {
@@ -2094,7 +2156,7 @@ function doPost(e) {
           'replyToken': replyToken,
           'messages': [{
             'type': 'text',
-            'text': '売上金額は0より大きい値を入力してください。',
+            'text': '該当の売上データを削除しました。',
           }]
         })
       });
