@@ -2081,6 +2081,26 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
     }
     
+    // ★★★ ここに0チェックを追加 ★★★
+    if (parseInt(userMessage) === 0) {
+      const url = 'https://api.line.me/v2/bot/message/reply';
+      UrlFetchApp.fetch(url, {
+        'headers': {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN,
+        },
+        'method': 'post',
+        'payload': JSON.stringify({
+          'replyToken': replyToken,
+          'messages': [{
+            'type': 'text',
+            'text': '売上金額は0より大きい値を入力してください。',
+          }]
+        })
+      });
+      return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // 半角数字の場合は売上金額として処理
     if (tempSheet) {
       // tempシートから情報を取得
