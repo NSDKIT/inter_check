@@ -45,15 +45,17 @@ function doPost(e) {
   const isTeamAMessage = (userMessage === "teamA");
   const isTeamBMessage = (userMessage === "teamB");
   const isTeamCMessage = (userMessage === "teamC");
+  const isTeamDMessage = (userMessage === "teamD");
   const isTeamAIncreaseMessage = (userMessage === "teamA_増額");
   const isTeamBIncreaseMessage = (userMessage === "teamB_増額");
   const isTeamCIncreaseMessage = (userMessage === "teamC_増額");
+  const isTeamDIncreaseMessage = (userMessage === "teamD_増額");
   const isChangeIncreaseMessage = (userMessage === "釣り銭増額");
   
   let currentTeam = "A";
   let tempSheet = null;
 
-  const teams = ["A", "B", "C"];
+  const teams = ["A", "B", "C", "D"];
   let foundActiveTeam = false;
 
   for (const team of teams) {
@@ -108,7 +110,7 @@ function doPost(e) {
   const isResetMessage = (userMessage === "リセット");
   
   if (isResetMessage) {
-    const allTempSheets = ["tempA", "tempB", "tempC"];
+    const allTempSheets = ["tempA", "tempB", "tempC", "tempD"];
     for (const sheetName of allTempSheets) {
       const sheet = spreadsheet.getSheetByName(sheetName);
       if (sheet) {
@@ -220,7 +222,7 @@ function doPost(e) {
     
   } else if (isRecordMessage) {
     // 全tempシートをクリア（リセット処理と同じ）
-    const allTempSheets = ["tempA", "tempB", "tempC"];
+    const allTempSheets = ["tempA", "tempB", "tempC", "tempD"];
     for (const sheetName of allTempSheets) {
       const sheet = spreadsheet.getSheetByName(sheetName);
       if (sheet) {
@@ -282,6 +284,8 @@ function doPost(e) {
     if (tempBSheet) tempBSheet.getRange("H1").setValue("");
     const tempCSheet = spreadsheet.getSheetByName("tempC");
     if (tempCSheet) tempCSheet.getRange("H1").setValue("");
+    const tempDSheet = spreadsheet.getSheetByName("tempD");
+    if (tempDSheet) tempDSheet.getRange("H1").setValue("");
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
@@ -312,6 +316,8 @@ function doPost(e) {
     if (tempASheet) tempASheet.getRange("H1").setValue("");
     const tempCSheet = spreadsheet.getSheetByName("tempC");
     if (tempCSheet) tempCSheet.getRange("H1").setValue("");
+    const tempDSheet = spreadsheet.getSheetByName("tempD");
+    if (tempDSheet) tempDSheet.getRange("H1").setValue("");
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
@@ -342,6 +348,8 @@ function doPost(e) {
     if (tempASheet) tempASheet.getRange("H1").setValue("");
     const tempBSheet = spreadsheet.getSheetByName("tempB");
     if (tempBSheet) tempBSheet.getRange("H1").setValue("");
+    const tempDSheet = spreadsheet.getSheetByName("tempD");
+    if (tempDSheet) tempDSheet.getRange("H1").setValue("");
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
@@ -354,6 +362,38 @@ function doPost(e) {
         'messages': [{
             'type': 'text',
             'text': 'チームCに切り替えました。',
+          },{
+            'type': 'text',
+            'text': 'いつの釣り銭を増額しますか？',
+          }]
+      })
+    });
+    return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
+    
+  } else if (isTeamDIncreaseMessage) {
+    tempSheet = spreadsheet.getSheetByName("tempD");
+    if (!tempSheet) tempSheet = spreadsheet.insertSheet("tempD");
+    tempSheet.getRange("F1").setValue("teamD");
+    currentTeam = "D";
+    tempSheet.getRange("H1").setValue("change_increase_mode");
+    const tempASheet = spreadsheet.getSheetByName("tempA");
+    if (tempASheet) tempASheet.getRange("H1").setValue("");
+    const tempBSheet = spreadsheet.getSheetByName("tempB");
+    if (tempBSheet) tempBSheet.getRange("H1").setValue("");
+    const tempCSheet = spreadsheet.getSheetByName("tempC");
+    if (tempCSheet) tempCSheet.getRange("H1").setValue("");
+    const url = 'https://api.line.me/v2/bot/message/reply';
+    UrlFetchApp.fetch(url, {
+      'headers': {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN,
+      },
+      'method': 'post',
+      'payload': JSON.stringify({
+        'replyToken': replyToken,
+        'messages': [{
+            'type': 'text',
+            'text': 'チームDに切り替えました。',
           },{
             'type': 'text',
             'text': 'いつの釣り銭を増額しますか？',
@@ -494,6 +534,8 @@ function doPost(e) {
     if (tempBSheet) tempBSheet.getRange("H1").setValue("");
     const tempCSheet = spreadsheet.getSheetByName("tempC");
     if (tempCSheet) tempCSheet.getRange("H1").setValue("");
+    const tempDSheet = spreadsheet.getSheetByName("tempD");
+    if (tempDSheet) tempDSheet.getRange("H1").setValue("");
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
@@ -522,6 +564,8 @@ function doPost(e) {
     if (tempASheet) tempASheet.getRange("H1").setValue("");
     const tempCSheet = spreadsheet.getSheetByName("tempC");
     if (tempCSheet) tempCSheet.getRange("H1").setValue("");
+    const tempDSheet = spreadsheet.getSheetByName("tempD");
+    if (tempDSheet) tempDSheet.getRange("H1").setValue("");
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
@@ -550,6 +594,8 @@ function doPost(e) {
     if (tempASheet) tempASheet.getRange("H1").setValue("");
     const tempBSheet = spreadsheet.getSheetByName("tempB");
     if (tempBSheet) tempBSheet.getRange("H1").setValue("");
+    const tempDSheet = spreadsheet.getSheetByName("tempD");
+    if (tempDSheet) tempDSheet.getRange("H1").setValue("");
     const url = 'https://api.line.me/v2/bot/message/reply';
     UrlFetchApp.fetch(url, {
       'headers': {
@@ -562,6 +608,36 @@ function doPost(e) {
         'messages': [{
             'type': 'text',
             'text': 'チームCに切り替えました。',
+          },{
+            'type': 'text',
+            'text': 'いつを記録しますか？',
+          }]
+      })
+    });
+    return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
+  } else if (isTeamDMessage) {
+    tempSheet = spreadsheet.getSheetByName("tempD");
+    if (!tempSheet) tempSheet = spreadsheet.insertSheet("tempD");
+    tempSheet.getRange("F1").setValue("teamD");
+    currentTeam = "D";
+    const tempASheet = spreadsheet.getSheetByName("tempA");
+    if (tempASheet) tempASheet.getRange("H1").setValue("");
+    const tempBSheet = spreadsheet.getSheetByName("tempB");
+    if (tempBSheet) tempBSheet.getRange("H1").setValue("");
+    const tempCSheet = spreadsheet.getSheetByName("tempC");
+    if (tempCSheet) tempCSheet.getRange("H1").setValue("");
+    const url = 'https://api.line.me/v2/bot/message/reply';
+    UrlFetchApp.fetch(url, {
+      'headers': {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ' + LINE_ACCESS_TOKEN,
+      },
+      'method': 'post',
+      'payload': JSON.stringify({
+        'replyToken': replyToken,
+        'messages': [{
+            'type': 'text',
+            'text': 'チームDに切り替えました。',
           },{
             'type': 'text',
             'text': 'いつを記録しますか？',
@@ -813,23 +889,28 @@ function doPost(e) {
       const teamASheetName = "A_現金管理表_" + targetMonth;
       const teamBSheetName = "B_現金管理表_" + targetMonth;
       const teamCSheetName = "C_現金管理表_" + targetMonth;
+      const teamDSheetName = "D_現金管理表_" + targetMonth;
       
       // 稼働時間用のシート名を構築
       const teamATimeSheetName = "A_売上・時間当たり売上高管理表_" + targetMonth;
       const teamBTimeSheetName = "B_売上・時間当たり売上高管理表_" + targetMonth;
       const teamCTimeSheetName = "C_売上・時間当たり売上高管理表_" + targetMonth;
+      const teamDTimeSheetName = "D_売上・時間当たり売上高管理表_" + targetMonth;
       
       let teamASheet = spreadsheet.getSheetByName(teamASheetName);
       let teamBSheet = spreadsheet.getSheetByName(teamBSheetName);
       let teamCSheet = spreadsheet.getSheetByName(teamCSheetName);
+      let teamDSheet = spreadsheet.getSheetByName(teamDSheetName);
       
       let teamATimeSheet = spreadsheet.getSheetByName(teamATimeSheetName);
       let teamBTimeSheet = spreadsheet.getSheetByName(teamBTimeSheetName);
       let teamCTimeSheet = spreadsheet.getSheetByName(teamCTimeSheetName);
+      let teamDTimeSheet = spreadsheet.getSheetByName(teamDTimeSheetName);
       
       let teamAData = { sales: 0, time: 0, found: false, days: 0, workingDays: 0 };
       let teamBData = { sales: 0, time: 0, found: false, days: 0, workingDays: 0 };
       let teamCData = { sales: 0, time: 0, found: false, days: 0, workingDays: 0 };
+      let teamDData = { sales: 0, time: 0, found: false, days: 0, workingDays: 0 };
       let resultMessages = [];
       
       try {
@@ -1256,6 +1337,147 @@ function doPost(e) {
             }
           }
         }
+        
+        // teamDのデータを取得（teamAと同じロジック）
+        if (teamDSheet) {
+          const dataD = teamDSheet.getDataRange().getValues();
+          
+          if (isMonthMode) {
+            // 月モード：全日付行を巡回して売上タイプ別に集計
+            let cashSales = 0, creditSales = 0, invoiceSales = 0;
+            for (let i = 0; i < dataD.length; i++) {
+              const day = dataD[i][0]; // A列の日付
+              if (day && day !== "" && day !== "日付" && typeof day === "string" && day.includes("日")) {
+                const rowData = dataD[i];
+                
+                // 1〜4件目をチェック
+                for (let itemNum = 1; itemNum <= 4; itemNum++) {
+                  const amountCol = (itemNum - 1) * 2 + 1; // B,D,F,H
+                  const typeCol = (itemNum - 1) * 2 + 2;   // C,E,G,I
+                  
+                  const amount = rowData[amountCol];
+                  const type = rowData[typeCol];
+                  
+                  if (amount && amount !== 0 && type) {
+                    if (type === "現金") cashSales += parseInt(amount);
+                    else if (type === "クレジット") creditSales += parseInt(amount);
+                    else if (type === "請求書") invoiceSales += parseInt(amount);
+                  }
+                }
+              }
+            }
+
+            if (cashSales > 0 || creditSales > 0 || invoiceSales > 0) {
+              teamDData.sales = cashSales + creditSales + invoiceSales;
+              teamDData.cashSales = cashSales;
+              teamDData.creditSales = creditSales;
+              teamDData.invoiceSales = invoiceSales;
+              teamDData.found = true;
+            }
+            
+            // 稼働日数をカウント（別のループ）
+            for (let i = 0; i < dataD.length; i++) {
+              const day = dataD[i][0]; // A列の日付
+              if (day && day !== "" && day !== "日付" && typeof day === "string" && day.includes("日")) {
+                const rowData = dataD[i];
+                let hasSalesData = false;
+                
+                // 各件目のデータをチェック
+                for (let itemNum = 1; itemNum <= 4; itemNum++) {
+                  const salesColIndex = (itemNum - 1) * 2 + 1;
+                  const salesValue = rowData[salesColIndex];
+                  
+                  if (salesValue !== "" && salesValue !== null && salesValue !== undefined && salesValue !== 0) {
+                    hasSalesData = true;
+                    break;
+                  }
+                }
+                
+                if (hasSalesData) {
+                  teamDData.workingDays++;
+                }
+              }
+            }
+          } else {
+            // 日モード：特定の日のデータを売上タイプ別に集計
+            for (let i = 0; i < dataD.length; i++) {
+              if (dataD[i][0] === targetDate) {
+                const rowData = dataD[i];
+                let cashSales = 0, creditSales = 0, invoiceSales = 0;
+                let hasSalesData = false;
+                
+                // 各件目のデータを売上タイプ別に抽出
+                for (let itemNum = 1; itemNum <= 4; itemNum++) {
+                  const amountCol = (itemNum - 1) * 2 + 1; // B,D,F,H
+                  const typeCol = (itemNum - 1) * 2 + 2;   // C,E,G,I
+                  
+                  const amount = rowData[amountCol];
+                  const type = rowData[typeCol];
+                  
+                  if (amount && amount !== 0 && type) {
+                    if (type === "現金") cashSales += parseInt(amount);
+                    else if (type === "クレジット") creditSales += parseInt(amount);
+                    else if (type === "請求書") invoiceSales += parseInt(amount);
+                    hasSalesData = true;
+                  }
+                }
+                
+                if (hasSalesData) {
+                  teamDData.sales = cashSales + creditSales + invoiceSales;
+                  teamDData.cashSales = cashSales;
+                  teamDData.creditSales = creditSales;
+                  teamDData.invoiceSales = invoiceSales;
+                  teamDData.found = true;
+                  teamDData.days = 1;
+                }
+                break;
+              }
+            }
+          }
+        }
+        
+        // teamDの稼働時間を取得
+        if (teamDTimeSheet) {
+          const timeDataD = teamDTimeSheet.getDataRange().getValues();
+          
+          if (isMonthMode) {
+            // 月モード：全日付行を巡回して稼働時間を集計
+            for (let i = 0; i < timeDataD.length; i++) {
+              const day = timeDataD[i][0]; // A列の日付
+              if (day && day !== "" && day !== "日付" && typeof day === "string" && day.includes("日")) {
+                const rowData = timeDataD[i];
+                
+                // 1〜4件目の稼働時間をチェック
+                for (let itemNum = 1; itemNum <= 4; itemNum++) {
+                  const timeCol = itemNum * 2; // C,E,G,I
+                  const timeValue = rowData[timeCol];
+                  
+                  if (timeValue && timeValue !== 0) {
+                    teamDData.time += parseInt(timeValue);
+                  }
+                }
+              }
+            }
+          } else {
+            // 日モード：特定の日の稼働時間を集計
+            for (let i = 0; i < timeDataD.length; i++) {
+              if (timeDataD[i][0] === targetDate) {
+                const rowData = timeDataD[i];
+                
+                // 各件目の稼働時間を抽出
+                for (let itemNum = 1; itemNum <= 4; itemNum++) {
+                  const timeCol = itemNum * 2; // C,E,G,I
+                  const timeValue = rowData[timeCol];
+                  
+                  if (timeValue && timeValue !== 0) {
+                    teamDData.time += parseInt(timeValue);
+                  }
+                }
+                break;
+              }
+            }
+          }
+        }
 
         // 結果の作成
         if (isMonthMode) {
@@ -1354,11 +1576,41 @@ function doPost(e) {
           resultMessages.push("【チームC】データなし");
         }
 
+        // teamD結果
+        if (teamDData.found) {
+          const hoursD = Math.floor(teamDData.time / 60);
+          const minutesD = teamDData.time % 60;
+          const salesPerMinuteD = teamDData.time > 0 ? Math.round(teamDData.sales / teamDData.time * 60) : 0;
+          let timeDisplayD = "";
+          if (hoursD > 0 && minutesD > 0) {
+            timeDisplayD = hoursD + "時間" + minutesD + "分";
+          } else if (hoursD > 0) {
+            timeDisplayD = hoursD + "時間";
+          } else {
+            timeDisplayD = minutesD + "分";
+          }
+          
+          resultMessages.push("【チームD】");
+          resultMessages.push("現金売上: " + (teamDData.cashSales || 0).toLocaleString() + "円");
+          resultMessages.push("クレジット売上: " + (teamDData.creditSales || 0).toLocaleString() + "円");
+          resultMessages.push("請求書売上: " + (teamDData.invoiceSales || 0).toLocaleString() + "円");
+          resultMessages.push("合計売上: " + teamDData.sales.toLocaleString() + "円");
+          resultMessages.push("稼働時間: " + timeDisplayD + " (" + teamDData.time + "分)");
+          resultMessages.push("時間単位売上: " + salesPerMinuteD.toLocaleString() + "円/時間");
+
+          if (isMonthMode && teamDData.workingDays > 0) {
+            const dailyAverageSalesD = Math.round(teamDData.sales / teamDData.workingDays);
+            resultMessages.push("日単位売上: " + dailyAverageSalesD.toLocaleString() + "円 (÷" + teamDData.workingDays + "稼働日)");
+          }
+        } else {
+          resultMessages.push("【チームD】データなし");
+        }
+
         // 合計計算
-        if (teamAData.found || teamBData.found || teamCData.found) {
-          const totalSales = teamAData.sales + teamBData.sales + teamCData.sales;
-          const totalTime = teamAData.time + teamBData.time + teamCData.time;
-          const totalDays = teamAData.days + teamBData.days + teamCData.days;
+        if (teamAData.found || teamBData.found || teamCData.found || teamDData.found) {
+          const totalSales = teamAData.sales + teamBData.sales + teamCData.sales + teamDData.sales;
+          const totalTime = teamAData.time + teamBData.time + teamCData.time + teamDData.time;
+          const totalDays = teamAData.days + teamBData.days + teamCData.days + teamDData.days;
           
           const totalHours = Math.floor(totalTime / 60);
           const totalMinutes = totalTime % 60;
@@ -1377,7 +1629,7 @@ function doPost(e) {
           resultMessages.push("合計稼働時間: " + totalTimeDisplay + " (" + totalTime + "分)");
           resultMessages.push("時間単位売上: " + totalSalesPerMinute.toLocaleString() + "円/時間");
 
-          const totalWorkingDays = teamAData.workingDays + teamBData.workingDays + teamCData.workingDays;
+          const totalWorkingDays = teamAData.workingDays + teamBData.workingDays + teamCData.workingDays + teamDData.workingDays;
           if (totalWorkingDays > 0) {
             const totalDailyAverageSales = Math.round(totalSales / totalWorkingDays);
             resultMessages.push("日単位売上: " + totalDailyAverageSales.toLocaleString() + "円/日");
